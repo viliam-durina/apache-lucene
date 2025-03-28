@@ -139,7 +139,7 @@ public abstract class PriorityQueue<T> implements Iterable<T> {
   }
 
   /**
-   * Determines the ordering of objects in this priority queue. Subclasses must override this one
+   * Determines the ordering of objects in this priority queue. Subclasses must override this
    * method.
    *
    * @return <code>true</code> iff parameter <code>a</code> is less than parameter <code>b</code>.
