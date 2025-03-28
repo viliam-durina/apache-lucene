@@ -17,7 +17,6 @@
 package org.apache.lucene.search;
 
 import java.io.IOException;
-import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.FixedBitSet;
 
 /**
@@ -29,7 +28,7 @@ import org.apache.lucene.util.FixedBitSet;
 public abstract class DocIdSetIterator {
 
   /** An empty {@code DocIdSetIterator} instance */
-  public static final DocIdSetIterator empty() {
+  public static DocIdSetIterator empty() {
     return new DocIdSetIterator() {
       boolean exhausted = false;
 
@@ -61,7 +60,7 @@ public abstract class DocIdSetIterator {
   }
 
   /** A {@link DocIdSetIterator} that matches all documents up to {@code maxDoc - 1}. */
-  public static final DocIdSetIterator all(int maxDoc) {
+  public static DocIdSetIterator all(int maxDoc) {
     return new DocIdSetIterator() {
       int doc = -1;
 
@@ -71,12 +70,12 @@ public abstract class DocIdSetIterator {
       }
 
       @Override
-      public int nextDoc() throws IOException {
+      public int nextDoc() {
         return advance(doc + 1);
       }
 
       @Override
-      public int advance(int target) throws IOException {
+      public int advance(int target) {
         doc = target;
         if (doc >= maxDoc) {
           doc = NO_MORE_DOCS;
@@ -88,6 +87,21 @@ public abstract class DocIdSetIterator {
       public long cost() {
         return maxDoc;
       }
+
+      @Override
+      public void intoBitSet(int upTo, FixedBitSet bitSet, int offset) {
+        assert offset <= doc;
+        upTo = Math.min(upTo, maxDoc);
+        if (upTo > doc) {
+          bitSet.set(doc - offset, upTo - offset);
+          advance(upTo);
+        }
+      }
+
+      @Override
+      public int docIDRunEnd() throws IOException {
+        return maxDoc;
+      }
     };
   }
 
@@ -95,7 +109,7 @@ public abstract class DocIdSetIterator {
    * A {@link DocIdSetIterator} that matches a range documents from minDocID (inclusive) to maxDocID
    * (exclusive).
    */
-  public static final DocIdSetIterator range(int minDoc, int maxDoc) {
+  public static DocIdSetIterator range(int minDoc, int maxDoc) {
     if (minDoc >= maxDoc) {
       throw new IllegalArgumentException(
           "minDoc must be < maxDoc but got minDoc=" + minDoc + " maxDoc=" + maxDoc);
@@ -112,12 +126,12 @@ public abstract class DocIdSetIterator {
       }
 
       @Override
-      public int nextDoc() throws IOException {
+      public int nextDoc() {
         return advance(doc + 1);
       }
 
       @Override
-      public int advance(int target) throws IOException {
+      public int advance(int target) {
         if (target < minDoc) {
           doc = minDoc;
         } else if (target >= maxDoc) {
@@ -131,6 +145,21 @@ public abstract class DocIdSetIterator {
       @Override
       public long cost() {
         return maxDoc - minDoc;
+      }
+
+      @Override
+      public void intoBitSet(int upTo, FixedBitSet bitSet, int offset) {
+        assert offset <= doc;
+        upTo = Math.min(upTo, maxDoc);
+        if (upTo > doc) {
+          bitSet.set(doc - offset, upTo - offset);
+          advance(upTo);
+        }
+      }
+
+      @Override
+      public int docIDRunEnd() throws IOException {
+        return maxDoc;
       }
     };
   }
@@ -220,26 +249,43 @@ public abstract class DocIdSetIterator {
    *
    * <pre class="prettyprint">
    * for (int doc = docID(); doc &lt; upTo; doc = nextDoc()) {
-   *   if (acceptDocs == null || acceptDocs.get(doc)) {
-   *     bitSet.set(doc - offset);
-   *   }
+   *   bitSet.set(doc - offset);
    * }
    * </pre>
    *
    * <p><b>Note</b>: {@code offset} must be less than or equal to the {@link #docID() current doc
-   * ID}.
+   * ID}. Behaviour is undefined if this iterator is unpositioned.
    *
    * <p><b>Note</b>: It is important not to clear bits from {@code bitSet} that may be already set.
    *
+   * <p><b>Note</b>: {@code offset} may be negative.
+   *
    * @lucene.internal
    */
-  public void intoBitSet(Bits acceptDocs, int upTo, FixedBitSet bitSet, int offset)
-      throws IOException {
+  public void intoBitSet(int upTo, FixedBitSet bitSet, int offset) throws IOException {
     assert offset <= docID();
     for (int doc = docID(); doc < upTo; doc = nextDoc()) {
-      if (acceptDocs == null || acceptDocs.get(doc)) {
-        bitSet.set(doc - offset);
-      }
+      bitSet.set(doc - offset);
     }
+  }
+
+  /**
+   * Returns the end of the run of consecutive doc IDs that match this {@link DocIdSetIterator} and
+   * that contains the current {@link #docID()}, that is: one plus the last doc ID of the run.
+   *
+   * <ol>
+   *   <li>The returned doc is greater than {@link #docID()}.
+   *   <li>All docs in range {@code [docID(), docIDRunEnd())} match this iterator.
+   *   <li>The current position of this iterator is not affected by calling {@link #docIDRunEnd()}.
+   * </ol>
+   *
+   * <p><b>Note</b>: It is illegal to call this method when the iterator is exhausted or not
+   * positioned.
+   *
+   * <p>The default implementation assumes runs of a single doc ID and returns {@link #docID()}) +
+   * 1.
+   */
+  public int docIDRunEnd() throws IOException {
+    return docID() + 1;
   }
 }
