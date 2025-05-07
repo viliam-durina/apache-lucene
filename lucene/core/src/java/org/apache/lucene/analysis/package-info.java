@@ -366,7 +366,7 @@
  * <p>Given that position(magenta) = 0 + position(red), they are at the same position, so anything
  * working with analyzers will return the exact same result if you replace "magenta" with "red" in
  * the input. However, multi-word synonyms are more tricky. Let's say that you want to build a
- * TokenStream where "IBM" is a synonym of "Internal Business Machines". Position increments are not
+ * TokenStream where "IBM" is a synonym of "International Business Machines". Position increments are not
  * enough anymore:
  *
  * <table>

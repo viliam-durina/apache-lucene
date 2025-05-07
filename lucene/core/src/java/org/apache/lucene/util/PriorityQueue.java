@@ -27,7 +27,7 @@ import java.util.function.Supplier;
  * cost implemented here is linear.
  *
  * <p><b>NOTE</b>: This class pre-allocates an array of length {@code maxSize+1} and pre-fills it
- * with elements if instantiated via the {@link #PriorityQueue(int,Supplier)} constructor.
+ * with elements instantiated via the {@link #PriorityQueue(int,Supplier)} constructor.
  *
  * <p><b>NOTE</b>: Iteration order is not specified.
  *
@@ -38,7 +38,7 @@ public abstract class PriorityQueue<T> implements Iterable<T> {
   private final int maxSize;
   private final T[] heap;
 
-  /** Create an empty priority queue of the configured size. */
+  /** Create an empty priority queue of the given maximum size. */
   public PriorityQueue(int maxSize) {
     this(maxSize, () -> null);
   }
@@ -51,27 +51,26 @@ public abstract class PriorityQueue<T> implements Iterable<T> {
    * <p>Those sentinel values should always compare worse than any non-sentinel value (i.e., {@link
    * #lessThan} should always favor the non-sentinel values).
    *
-   * <p>By default, the supplier returns null, which means the queue will not be filled with
+   * <p>If the supplier returns null, it means the queue will not be filled with
    * sentinel values. Otherwise, the value returned will be used to pre-populate the queue.
    *
-   * <p>If this method is extended to return a non-null value, then the following usage pattern is
+   * <p>If the supplier returns a non-null value, then the following usage pattern is
    * recommended:
    *
    * <pre class="prettyprint">
-   * PriorityQueue&lt;MyObject&gt; pq = new MyQueue&lt;MyObject&gt;(numHits);
+   * PriorityQueue&lt;MyObject&gt; pq = new MyQueue&lt;&gt;(numHits);
    * // save the 'top' element, which is guaranteed to not be null.
    * MyObject pqTop = pq.top();
    * &lt;...&gt;
    * // now in order to add a new element, which is 'better' than top (after
    * // you've verified it is better), it is as simple as:
-   * pqTop.change().
+   * pqTop.change();
    * pqTop = pq.updateTop();
    * </pre>
    *
-   * <b>NOTE:</b> the given supplier will be called {@code maxSize} times, relying on a new object
-   * to be returned and will not check if it's null again. Therefore you should ensure any call to
-   * this method creates a new instance and behaves consistently, e.g., it cannot return null if it
-   * previously returned non-null and all returned instances must {@link #lessThan compare equal}.
+   * <b>NOTE:</b> The supplier must either return null all the time, or non-null all the time. Behavior
+   * is unspecified if it doesn't. If it returns non-null, it will be called {@code maxSize} times. All
+   * returned non-null values must {@link #lessThan compare equal}.
    */
   public PriorityQueue(int maxSize, Supplier<T> sentinelObjectSupplier) {
     final int heapSize;
@@ -140,7 +139,7 @@ public abstract class PriorityQueue<T> implements Iterable<T> {
   }
 
   /**
-   * Determines the ordering of objects in this priority queue. Subclasses must define this one
+   * Determines the ordering of objects in this priority queue. Subclasses must override this
    * method.
    *
    * @return <code>true</code> iff parameter <code>a</code> is less than parameter <code>b</code>.
@@ -148,8 +147,8 @@ public abstract class PriorityQueue<T> implements Iterable<T> {
   protected abstract boolean lessThan(T a, T b);
 
   /**
-   * Adds an Object to a PriorityQueue in log(size) time. If one tries to add more objects than
-   * maxSize from initialize an {@link ArrayIndexOutOfBoundsException} is thrown.
+   * Adds an object to this PriorityQueue in log(size) time. If one tries to add more objects than
+   * maxSize given in the constructor, an {@link ArrayIndexOutOfBoundsException} is thrown.
    *
    * @return the new 'top' element in the queue.
    */
@@ -163,11 +162,13 @@ public abstract class PriorityQueue<T> implements Iterable<T> {
   }
 
   /**
-   * Adds an Object to a PriorityQueue in log(size) time. It returns the object (if any) that was
-   * dropped off the heap because it was full. This can be the given parameter (in case it is
-   * smaller than the full heap's minimum, and couldn't be added), or another object that was
+   * Adds an object to this PriorityQueue in log(size) time. It returns the object (if any) that was
+   * removed from the heap because it was full. This can be the given parameter (in case it is
+   * smaller than the heap's minimum, and couldn't be added), or another object that was
    * previously the smallest value in the heap and now has been replaced by a larger one, or null if
    * the queue wasn't yet full with maxSize elements.
+   *
+   * @return The object removed due to overflow, or null, if there was no overflow
    */
   public T insertWithOverflow(T element) {
     if (size < maxSize) {
@@ -206,7 +207,7 @@ public abstract class PriorityQueue<T> implements Iterable<T> {
   }
 
   /**
-   * Should be called when the Object at top changes values. Still log(n) worst case, but it's at
+   * Should be called when the object at the top is modified. Still log(n) worst case, but it's at
    * least twice as fast to
    *
    * <pre class="prettyprint">
@@ -250,8 +251,7 @@ public abstract class PriorityQueue<T> implements Iterable<T> {
 
   /**
    * Removes an existing element currently stored in the PriorityQueue. Cost is linear with the size
-   * of the queue. (A specialization of PriorityQueue which tracks element positions would provide a
-   * constant remove time but the trade-off would be extra cost to all additions/insertions)
+   * of the queue.
    */
   public final boolean remove(T element) {
     for (int i = 1; i <= size; i++) {
@@ -303,7 +303,7 @@ public abstract class PriorityQueue<T> implements Iterable<T> {
   }
 
   /**
-   * This method returns the internal heap array as Object[].
+   * Returns the internal heap array as Object[].
    *
    * @lucene.internal
    */
@@ -313,7 +313,7 @@ public abstract class PriorityQueue<T> implements Iterable<T> {
 
   @Override
   public Iterator<T> iterator() {
-    return new Iterator<T>() {
+    return new Iterator<>() {
 
       int i = 1;
 
