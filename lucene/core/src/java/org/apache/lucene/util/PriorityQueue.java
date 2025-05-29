@@ -51,11 +51,10 @@ public abstract class PriorityQueue<T> implements Iterable<T> {
    * <p>Those sentinel values should always compare worse than any non-sentinel value (i.e., {@link
    * #lessThan} should always favor the non-sentinel values).
    *
-   * <p>If the supplier returns null, it means the queue will not be filled with
-   * sentinel values. Otherwise, the value returned will be used to pre-populate the queue.
+   * <p>If the supplier returns null, it means the queue will not be filled with sentinel values.
+   * Otherwise, the value returned will be used to pre-populate the queue.
    *
-   * <p>If the supplier returns a non-null value, then the following usage pattern is
-   * recommended:
+   * <p>If the supplier returns a non-null value, then the following usage pattern is recommended:
    *
    * <pre class="prettyprint">
    * PriorityQueue&lt;MyObject&gt; pq = new MyQueue&lt;&gt;(numHits);
@@ -68,9 +67,9 @@ public abstract class PriorityQueue<T> implements Iterable<T> {
    * pqTop = pq.updateTop();
    * </pre>
    *
-   * <b>NOTE:</b> The supplier must either return null all the time, or non-null all the time. Behavior
-   * is unspecified if it doesn't. If it returns non-null, it will be called {@code maxSize} times. All
-   * returned non-null values must {@link #lessThan compare equal}.
+   * <b>NOTE:</b> The supplier must either return null all the time, or non-null all the time.
+   * Behavior is unspecified if it doesn't. If it returns non-null, it will be called {@code
+   * maxSize} times. All returned non-null values must {@link #lessThan compare equal}.
    */
   public PriorityQueue(int maxSize, Supplier<T> sentinelObjectSupplier) {
     final int heapSize;
@@ -164,9 +163,9 @@ public abstract class PriorityQueue<T> implements Iterable<T> {
   /**
    * Adds an object to this PriorityQueue in log(size) time. It returns the object (if any) that was
    * removed from the heap because it was full. This can be the given parameter (in case it is
-   * smaller than the heap's minimum, and couldn't be added), or another object that was
-   * previously the smallest value in the heap and now has been replaced by a larger one, or null if
-   * the queue wasn't yet full with maxSize elements.
+   * smaller than the heap's minimum, and couldn't be added), or another object that was previously
+   * the smallest value in the heap and now has been replaced by a larger one, or null if the queue
+   * wasn't yet full with maxSize elements.
    *
    * @return The object removed due to overflow, or null, if there was no overflow
    */

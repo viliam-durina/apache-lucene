@@ -469,9 +469,9 @@ public class IndexWriter
    * session can be quickly made available for searching without closing the writer nor calling
    * {@link #commit}.
    *
-   * <p>Note that this is functionally equivalent to calling {@link #commit} and then opening a new reader.
-   * But the turnaround time of this method should be faster since it avoids the potentially costly
-   * {@link #commit}.
+   * <p>Note that this is functionally equivalent to calling {@link #commit} and then opening a new
+   * reader. But the turnaround time of this method should be faster since it avoids the potentially
+   * costly {@link #commit}.
    *
    * <p>You must close the {@link IndexReader} returned by this method once you are done using it.
    *
@@ -500,8 +500,8 @@ public class IndexWriter
    * AlreadyClosedException}.
    *
    * @lucene.experimental
-   * @return IndexReader that covers the entire index plus all changes made so far by this IndexWriter
-   *     instance
+   * @return IndexReader that covers the entire index plus all changes made so far by this
+   *     IndexWriter instance
    * @throws IOException If there is a low-level I/O error
    */
   DirectoryReader getReader(boolean applyAllDeletes, boolean writeAllDeletes) throws IOException {
