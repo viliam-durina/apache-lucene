@@ -2342,7 +2342,7 @@ public class IndexWriter
     final CachingMergeContext cachingMergeContext = new CachingMergeContext(this);
     if (maxNumSegments != UNBOUNDED_MAX_MERGE_SEGMENTS) {
       assert trigger == MergeTrigger.EXPLICIT || trigger == MergeTrigger.MERGE_FINISHED
-          : "Expected EXPLICT or MERGE_FINISHED as trigger even with maxNumSegments set but was: "
+          : "Expected EXPLICIT or MERGE_FINISHED as trigger even with maxNumSegments set but was: "
               + trigger.name();
 
       spec =

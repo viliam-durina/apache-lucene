@@ -447,7 +447,7 @@ public class LiveIndexWriterConfig {
   }
 
   /**
-   * Expert: return the amount of time to wait for merges returned by by
+   * Expert: return the amount of time to wait for merges returned by
    * MergePolicy.findFullFlushMerges(...). If this time is reached, we proceed with the commit based
    * on segments merged up to that point. The merges are not cancelled, and may still run to
    * completion independent of the commit.

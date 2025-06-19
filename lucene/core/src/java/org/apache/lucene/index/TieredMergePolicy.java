@@ -887,9 +887,8 @@ public class TieredMergePolicy extends MergePolicy {
         final SegmentCommitInfo current = sortedSizeAndDocs.get(index).segInfo;
         final int initialCandidateSize = candidate.size();
         final long currentSegmentSize = current.sizeInBytes();
-        // We either add to the bin because there's space or because the it is the smallest possible
-        // bin since
-        // decrementing the index will move us to even larger segments.
+        // We either add to the bin because there's space or because it is the smallest possible
+        // bin since decrementing the index will move us to even larger segments.
         if (currentCandidateBytes + currentSegmentSize <= maxMergeBytes
             || initialCandidateSize < 2) {
           candidate.add(current);
@@ -937,7 +936,7 @@ public class TieredMergePolicy extends MergePolicy {
     }
 
     // First do a quick check that there's any work to do.
-    // NOTE: this makes BaseMergePOlicyTestCase.testFindForcedDeletesMerges work
+    // NOTE: this makes BaseMergePolicyTestCase.testFindForcedDeletesMerges work
     final Set<SegmentCommitInfo> merging = mergeContext.getMergingSegments();
 
     boolean haveWork = false;
